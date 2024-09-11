@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import MainLayout from "./components/MainLayout";
+import Battle from "./components/Battle";
 
 import {
   createBrowserRouter,
@@ -14,6 +15,7 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<MainLayout />}>
         <Route index element={""} />
+        <Route path="battlefield" element={<Battle />} />
       </Route>
     )
   );
