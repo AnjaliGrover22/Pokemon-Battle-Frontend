@@ -9,9 +9,27 @@ const Battle = () => {
   const [winner, setWinner] = useState(null);
   const [isBattleOngoing, setIsBattleOngoing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [battles_won, setBattles_won] = useState(0);
+  const [battles_lost, setBattles_lost] = useState(0);
+  const username = "Anjali";
+  const [isBattleComplete, setIsBattleComplete] = useState(false);
 
   // Helper function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
+
+  //load the initial state from localStorage
+
+  useEffect(() => {
+    const storedBattlesWon = Number(localStorage.getItem("battles_won")) || 0;
+    const storedBattlesLost = Number(localStorage.getItem("battles_lost")) || 0;
+
+    setBattles_won(storedBattlesWon);
+    setBattles_lost(storedBattlesLost);
+
+    const totalBattles = storedBattlesWon + storedBattlesLost;
+    setBattleCount(totalBattles);
+    localStorage.setItem("battleCount", totalBattles);
+  }, []);
 
   // Helper function to initialize a new game
   const startNewGame = () => {
@@ -23,17 +41,70 @@ const Battle = () => {
     localStorage.setItem("botId", newBotId);
 
     // Update battle count
-    const currentCount = Number(localStorage.getItem("battleCount")) || 0;
-    localStorage.setItem("battleCount", currentCount + 1);
-    setBattleCount(currentCount + 1);
+    setBattleCount((prevCount) => {
+      const newCount = prevCount + 1;
+      localStorage.setItem("battleCount", newCount);
+      return newCount;
+    });
 
     // Use setTimeout to delay showing the result by 3 seconds
     setTimeout(() => {
       if (selectedPokemon && botPokemon) {
         const gameWinner = calculateWinner(selectedPokemon, botPokemon);
+
+        setWinner(gameWinner);
+        setIsBattleOngoing(false); // Battle has ended
+        setIsAnimating(false);
+        setIsBattleComplete(true); // Stop animation after battle ends
+      }
+    }, 3000); // Delay of 3 seconds (3000 ms)
+  };
+
+  const getNewPlayer = async () => {
+    if (!isBattleComplete) {
+      return;
+    }
+
+    // Immediately stop animation
+    setIsAnimating(false);
+
+    // Prepare for a new battle
+    setWinner(null);
+    setIsBattleOngoing(true);
+    setIsBattleComplete(false);
+
+    const newBotId = getRandomPokemonId();
+
+    // Fetch new Pokémon data
+    try {
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${newBotId}`
+      );
+      const data = await response.json();
+      setBotPokemon(data);
+
+      // Successfully fetched new bot Pokémon data, resume animation
+      setIsAnimating(true);
+
+      // Update battle count
+      setBattleCount((prevCount) => {
+        const newCount = prevCount + 1;
+        localStorage.setItem("battleCount", newCount);
+        return newCount;
+      });
+    } catch (error) {
+      console.error("Error fetching new Pokémon data:", error);
+    }
+
+    // Use setTimeout to delay showing the result by 3 seconds
+    setTimeout(() => {
+      if (selectedPokemon && botPokemon) {
+        const gameWinner = calculateWinner(selectedPokemon, botPokemon);
+
         setWinner(gameWinner);
         setIsBattleOngoing(false); // Battle has ended
         setIsAnimating(false); // Stop animation after battle ends
+        setIsBattleComplete(true); // Update battle complete state
       }
     }, 3000); // Delay of 3 seconds (3000 ms)
   };
@@ -90,6 +161,19 @@ const Battle = () => {
     const botScore =
       botStats.hp + botStats.attack * 2 + botStats.defense + botStats.speed;
 
+    if (playerScore > botScore) {
+      setBattles_won((prevWins) => {
+        const newWins = prevWins + 1;
+        localStorage.setItem("battles_won", newWins);
+        return newWins;
+      });
+    } else {
+      setBattles_lost((prevLosses) => {
+        const newLosses = prevLosses + 1;
+        localStorage.setItem("battles_lost", newLosses);
+        return newLosses;
+      });
+    }
     return playerScore > botScore ? "Player" : "Opponent";
   };
 
@@ -161,8 +245,16 @@ const Battle = () => {
         onClick={startNewGame}
         className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
       >
-        Start New Game
+        Attack
       </button>
+      {!isBattleOngoing && winner && (
+        <button
+          onClick={getNewPlayer}
+          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Change opponent
+        </button>
+      )}
     </div>
   );
 };
