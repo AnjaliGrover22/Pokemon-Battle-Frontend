@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
+import "../App.css";
 
 const Battle = () => {
   const selectedId = 3; // Player's selected Pokémon ID
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);
   const [battleCount, setBattleCount] = useState(0);
+  const [winner, setWinner] = useState(null);
+  const [isBattleOngoing, setIsBattleOngoing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Helper function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
 
   // Helper function to initialize a new game
   const startNewGame = () => {
+    setWinner(null);
+    setIsBattleOngoing(true);
+    setIsAnimating(true); // Start animation
+
     const newBotId = getRandomPokemonId();
     localStorage.setItem("botId", newBotId);
 
@@ -18,6 +26,16 @@ const Battle = () => {
     const currentCount = Number(localStorage.getItem("battleCount")) || 0;
     localStorage.setItem("battleCount", currentCount + 1);
     setBattleCount(currentCount + 1);
+
+    // Use setTimeout to delay showing the result by 3 seconds
+    setTimeout(() => {
+      if (selectedPokemon && botPokemon) {
+        const gameWinner = calculateWinner(selectedPokemon, botPokemon);
+        setWinner(gameWinner);
+        setIsBattleOngoing(false); // Battle has ended
+        setIsAnimating(false); // Stop animation after battle ends
+      }
+    }, 3000); // Delay of 3 seconds (3000 ms)
   };
 
   // Fetch Pokémon data from the API
@@ -28,18 +46,14 @@ const Battle = () => {
       setter(data);
     };
 
-    // Fetch selected Pokémon data
     fetchPokemonData(selectedId, setSelectedPokemon);
 
-    // Fetch or initialize bot Pokémon data
     const initializeGame = async () => {
       const storedBotId = localStorage.getItem("botId");
 
       if (storedBotId) {
-        // Use existing bot ID
         fetchPokemonData(storedBotId, setBotPokemon);
       } else {
-        // Start a new game if no bot ID exists
         startNewGame();
         const newBotId = localStorage.getItem("botId");
         fetchPokemonData(newBotId, setBotPokemon);
@@ -48,6 +62,36 @@ const Battle = () => {
 
     initializeGame();
   }, [selectedId]);
+
+  // Function to calculate the winner
+  const calculateWinner = (player, bot) => {
+    const playerStats = {
+      hp: player.stats.find((stat) => stat.stat.name === "hp").base_stat,
+      attack: player.stats.find((stat) => stat.stat.name === "attack")
+        .base_stat,
+      defense: player.stats.find((stat) => stat.stat.name === "defense")
+        .base_stat,
+      speed: player.stats.find((stat) => stat.stat.name === "speed").base_stat,
+    };
+
+    const botStats = {
+      hp: bot.stats.find((stat) => stat.stat.name === "hp").base_stat,
+      attack: bot.stats.find((stat) => stat.stat.name === "attack").base_stat,
+      defense: bot.stats.find((stat) => stat.stat.name === "defense").base_stat,
+      speed: bot.stats.find((stat) => stat.stat.name === "speed").base_stat,
+    };
+
+    // Simple battle formula: hp + (attack * 2) + defense + speed
+    const playerScore =
+      playerStats.hp +
+      playerStats.attack * 2 +
+      playerStats.defense +
+      playerStats.speed;
+    const botScore =
+      botStats.hp + botStats.attack * 2 + botStats.defense + botStats.speed;
+
+    return playerScore > botScore ? "Player" : "Opponent";
+  };
 
   if (!selectedPokemon || !botPokemon) {
     return <div className="text-white text-center">Loading...</div>;
@@ -68,9 +112,12 @@ const Battle = () => {
             {selectedPokemon.name}
           </h2>
           <img
+            id="player-pokemon"
             src={selectedPokemon.sprites.other.home.front_default}
             alt={selectedPokemon.name}
-            className="w-96 h-96 object-contain mb-2 drop-shadow-glow-red"
+            className={`w-96 h-96 object-contain mb-2 ${
+              isAnimating ? "animate-heavy-shake animate-move-right" : ""
+            }`}
           />
         </div>
 
@@ -85,30 +132,23 @@ const Battle = () => {
             {botPokemon.name}
           </h2>
           <img
+            id="bot-pokemon"
             src={botPokemon.sprites.other.home.front_default}
             alt={botPokemon.name}
-            className="w-96 h-96 object-contain mb-2 drop-shadow-glow-yellow"
+            className={`w-96 h-96 object-contain mb-2 ${
+              isAnimating ? "animate-heavy-shake animate-move-left" : ""
+            }`}
           />
         </div>
       </div>
-      <div className="flex justify-between items-center w-full px-80 mt-80 ">
-        {/* Player 1 Info */}
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-gray-800"></div>
-          <span className="text-white font-semibold mt-2">You</span>
-          <div className="relative w-32 h-2 bg-gray-700 rounded-lg mt-2">
-            <div className="absolute bg-orange-500 h-full w-1/2 rounded-lg"></div>
-          </div>
-        </div>
 
-        {/* Bot Info */}
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-gray-800"></div>
-          <span className="text-white font-semibold mt-2">Player 2</span>
-          <div className="relative w-32 h-2 bg-gray-700 rounded-lg mt-2">
-            <div className="absolute bg-blue-600 h-full w-3/4 rounded-lg"></div>
-          </div>
-        </div>
+      {/* Winner Display */}
+      <div className="text-white text-3xl font-bold">
+        {isBattleOngoing
+          ? "Battle Ongoing..."
+          : winner
+          ? `${winner} Wins!`
+          : ""}
       </div>
 
       {/* Battle Count */}
