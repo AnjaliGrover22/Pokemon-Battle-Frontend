@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import "../App.css";
 
 const Battle = () => {
-  //context value used here
   const {
     battleCount,
     setBattleCount,
@@ -13,10 +11,9 @@ const Battle = () => {
     battles_lost,
     setBattles_lost,
     username,
-    setUsername,
   } = useOutletContext();
 
-  const selectedId = 3; // Player's selected Pokémon ID
+  const selectedId = 3; // Player's selected Pokémon ID (hardcoded for now)
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);
   const [winner, setWinner] = useState(null);
@@ -24,128 +21,45 @@ const Battle = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isBattleComplete, setIsBattleComplete] = useState(false);
 
-  // Helper function to generate a random Pokémon ID
+  // Function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
 
-  //load the initial state from localStorage
-
-  useEffect(() => {
-    const storedBattlesWon = Number(localStorage.getItem("battles_won")) || 0;
-    const storedBattlesLost = Number(localStorage.getItem("battles_lost")) || 0;
-
-    setBattles_won(storedBattlesWon);
-    setBattles_lost(storedBattlesLost);
-
-    const totalBattles = storedBattlesWon + storedBattlesLost;
-    setBattleCount(totalBattles);
-    localStorage.setItem("battleCount", totalBattles);
-  }, []);
-
-  // Helper function to initialize a new game
-  const startNewGame = () => {
-    setWinner(null);
-    setIsBattleOngoing(true);
-    setIsAnimating(true); // Start animation
-
-    const newBotId = getRandomPokemonId();
-    localStorage.setItem("botId", newBotId);
-
-    // Update battle count
-    setBattleCount((prevCount) => {
-      const newCount = prevCount + 1;
-      localStorage.setItem("battleCount", newCount);
-      return newCount;
-    });
-
-    // Use setTimeout to delay showing the result by 3 seconds
-    setTimeout(() => {
-      if (selectedPokemon && botPokemon) {
-        const gameWinner = calculateWinner(selectedPokemon, botPokemon);
-
-        setWinner(gameWinner);
-        setIsBattleOngoing(false); // Battle has ended
-        setIsAnimating(false);
-        setIsBattleComplete(true); // Stop animation after battle ends
+  // Fetch Pokémon data from API
+  const fetchPokemonData = async (id, setter) => {
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setter(data);
+      } else {
+        console.error("Failed to fetch Pokémon data.");
       }
-    }, 3000); // Delay of 3 seconds (3000 ms)
+    } catch (error) {
+      console.error("Error fetching Pokémon data:", error);
+    }
   };
 
-  const getNewPlayer = async () => {
-    if (!isBattleComplete) {
-      return;
-    }
-
-    // Immediately stop animation
-    setIsAnimating(false);
-    setIsBattleOngoing(false);
-
-    // Prepare for a new battle
-    setWinner(null);
-    setIsBattleComplete(false);
-
-    const newBotId = getRandomPokemonId();
-
-    // Fetch new Pokémon data
+  // Fetch user stats from MongoDB
+  const fetchUserStats = async () => {
+    if (!username) return; // Ensure username is defined
     try {
       const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${newBotId}`
+        `http://localhost:8081/api/scores/${username}`
       );
-      const data = await response.json();
-      setBotPokemon(data);
-
-      // Successfully fetched new bot Pokémon data, resume animation
-      setIsBattleOngoing(true);
-      setIsAnimating(true);
-
-      // Update battle count
-      setBattleCount((prevCount) => {
-        const newCount = prevCount + 1;
-        localStorage.setItem("battleCount", newCount);
-        return newCount;
-      });
-    } catch (error) {
-      console.error("Error fetching new Pokémon data:", error);
-    }
-
-    // Use setTimeout to delay showing the result by 3 seconds
-    setTimeout(() => {
-      if (selectedPokemon && botPokemon) {
-        const gameWinner = calculateWinner(selectedPokemon, botPokemon);
-
-        setWinner(gameWinner);
-        setIsBattleOngoing(false); // Battle has ended
-        setIsAnimating(false); // Stop animation after battle ends
-        setIsBattleComplete(true); // Update battle complete state
+      if (response.ok) {
+        const data = await response.json();
+        setBattles_won(data.battles_won || 0);
+        setBattles_lost(data.battles_lost || 0);
+        setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
+      } else {
+        console.error("Failed to fetch user data.");
       }
-    }, 3000); // Delay of 3 seconds (3000 ms)
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
-  // Fetch Pokémon data from the API
-  useEffect(() => {
-    const fetchPokemonData = async (id, setter) => {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-      const data = await response.json();
-      setter(data);
-    };
-
-    fetchPokemonData(selectedId, setSelectedPokemon);
-
-    const initializeGame = async () => {
-      const storedBotId = localStorage.getItem("botId");
-
-      if (storedBotId) {
-        fetchPokemonData(storedBotId, setBotPokemon);
-      } else {
-        startNewGame();
-        const newBotId = localStorage.getItem("botId");
-        fetchPokemonData(newBotId, setBotPokemon);
-      }
-    };
-
-    initializeGame();
-  }, [selectedId]);
-
-  // Function to calculate the winner
+  // Calculate the winner of the battle
   const calculateWinner = (player, bot) => {
     const playerStats = {
       hp: player.stats.find((stat) => stat.stat.name === "hp").base_stat,
@@ -163,7 +77,7 @@ const Battle = () => {
       speed: bot.stats.find((stat) => stat.stat.name === "speed").base_stat,
     };
 
-    // Simple battle formula: hp + (attack * 2) + defense + speed
+    // Simple battle formula
     const playerScore =
       playerStats.hp +
       playerStats.attack * 2 +
@@ -175,25 +89,102 @@ const Battle = () => {
     if (playerScore > botScore) {
       setBattles_won((prevWins) => {
         const newWins = prevWins + 1;
-        localStorage.setItem("battles_won", newWins);
+        updateUserData(newWins, battles_lost);
         return newWins;
       });
+      return "Player";
     } else {
       setBattles_lost((prevLosses) => {
         const newLosses = prevLosses + 1;
-        localStorage.setItem("battles_lost", newLosses);
+        updateUserData(battles_won, newLosses);
         return newLosses;
       });
+      return "Opponent";
     }
-    return playerScore > botScore ? "Player" : "Opponent";
   };
 
+  // Update user data in the database
+  const updateUserData = async (newWins, newLosses) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/scores/${username}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            battles_won: newWins,
+            battles_lost: newLosses,
+            total_battles: newWins + newLosses,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update user data");
+      }
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
+
+  // Start a new battle
+  const startNewGame = () => {
+    if (!selectedPokemon || !botPokemon) {
+      console.error("Pokémon data is not ready");
+      return;
+    }
+
+    setIsBattleOngoing(true);
+    setIsAnimating(true);
+    setWinner(null); // Reset winner
+    setBattleCount((prevCount) => prevCount + 1);
+
+    setTimeout(() => {
+      const gameWinner = calculateWinner(selectedPokemon, botPokemon);
+      setWinner(gameWinner);
+      setIsBattleOngoing(false);
+      setIsAnimating(false);
+      setIsBattleComplete(true);
+    }, 3000); // 3-second delay for battle animation
+  };
+
+  // Fetch a new opponent (bot Pokémon)
+  const getNewPlayer = async () => {
+    const newBotId = getRandomPokemonId();
+    setIsBattleComplete(false);
+
+    try {
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${newBotId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setBotPokemon(data);
+      } else {
+        console.error("Error fetching new Pokémon:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching new Pokémon:", error);
+    }
+  };
+
+  // Initial load for player and bot Pokémon
+  useEffect(() => {
+    fetchUserStats();
+    fetchPokemonData(selectedId, setSelectedPokemon); // Player's Pokémon
+    getNewPlayer(); // Bot's Pokémon
+  }, [selectedId]); // Adjusted dependencies
+
+  // Ensure selectedPokemon and botPokemon are loaded
   if (!selectedPokemon || !botPokemon) {
     return <div className="text-white text-center">Loading...</div>;
   }
 
   return (
     <div className="bg-black min-h-screen flex flex-col items-center">
+      <div className="my-25 py-5 text-right rounded-lg text-white">
+        <h5>Welcome {username}</h5>
+      </div>
       {/* Title */}
       <div className="text-center text-white text-3xl font-semibold mt-6">
         Battleground
@@ -211,7 +202,7 @@ const Battle = () => {
             src={selectedPokemon.sprites.other.home.front_default}
             alt={selectedPokemon.name}
             className={`w-96 h-96 object-contain mb-2 ${
-              isAnimating ? "animate-heavy-shake animate-move-right" : ""
+              isAnimating ? "animate-heavy-shake animate-move-left" : ""
             }`}
           />
         </div>
@@ -255,6 +246,7 @@ const Battle = () => {
       <button
         onClick={startNewGame}
         className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
+        disabled={isBattleOngoing}
       >
         Attack
       </button>
