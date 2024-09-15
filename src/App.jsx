@@ -9,6 +9,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
+import Board from "./components/Board";
 
 function App() {
   const router = createBrowserRouter(
@@ -16,6 +17,7 @@ function App() {
       <Route path="/" element={<MainLayout />}>
         <Route index element={""} />
         <Route path="battlefield" element={<Battle />} />
+        <Route path="battlefield/board" element={<Board />} />
       </Route>
     )
   );

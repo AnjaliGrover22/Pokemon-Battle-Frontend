@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import "../App.css";
 
 const Battle = () => {
+  //context value used here
+  const {
+    battleCount,
+    setBattleCount,
+    battles_won,
+    setBattles_won,
+    battles_lost,
+    setBattles_lost,
+    username,
+    setUsername,
+  } = useOutletContext();
+
   const selectedId = 3; // Player's selected Pokémon ID
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);
-  const [battleCount, setBattleCount] = useState(0);
   const [winner, setWinner] = useState(null);
   const [isBattleOngoing, setIsBattleOngoing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [battles_won, setBattles_won] = useState(0);
-  const [battles_lost, setBattles_lost] = useState(0);
-  const username = "Anjali";
   const [isBattleComplete, setIsBattleComplete] = useState(false);
 
   // Helper function to generate a random Pokémon ID
@@ -67,10 +77,10 @@ const Battle = () => {
 
     // Immediately stop animation
     setIsAnimating(false);
+    setIsBattleOngoing(false);
 
     // Prepare for a new battle
     setWinner(null);
-    setIsBattleOngoing(true);
     setIsBattleComplete(false);
 
     const newBotId = getRandomPokemonId();
@@ -84,6 +94,7 @@ const Battle = () => {
       setBotPokemon(data);
 
       // Successfully fetched new bot Pokémon data, resume animation
+      setIsBattleOngoing(true);
       setIsAnimating(true);
 
       // Update battle count
