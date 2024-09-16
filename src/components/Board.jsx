@@ -134,41 +134,43 @@ const Board = () => {
     <div className="bg-black min-h-screen p-8 text-white">
       {/* Current User Stats Section */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
-          Score Board
-        </h1>
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6">
-          <table className="w-full border-collapse">
-            <tbody>
-              <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                  User:
-                </th>
-                <td className="p-4 text-lg w-3/4">
-                  {username || "Not logged in"}
-                </td>
-              </tr>
-              <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                  Total Battles:
-                </th>
-                <td className="p-4 text-lg w-3/4">{battleCount}</td>
-              </tr>
-              <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                  Battles Won:
-                </th>
-                <td className="p-4 text-lg w-3/4">{battles_won}</td>
-              </tr>
-              <tr>
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                  Battles Lost:
-                </th>
-                <td className="p-4 text-lg w-3/4">{battles_lost}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>{" "}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
+            Score Board
+          </h1>
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+            <table className="w-full border-collapse">
+              <tbody>
+                <tr className="border-b border-gray-600">
+                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                    User:
+                  </th>
+                  <td className="p-4 text-lg w-3/4">
+                    {username || "Not logged in"}
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-600">
+                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                    Total Battles:
+                  </th>
+                  <td className="p-4 text-lg w-3/4">{battleCount}</td>
+                </tr>
+                <tr className="border-b border-gray-600">
+                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                    Battles Won:
+                  </th>
+                  <td className="p-4 text-lg w-3/4">{battles_won}</td>
+                </tr>
+                <tr>
+                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                    Battles Lost:
+                  </th>
+                  <td className="p-4 text-lg w-3/4">{battles_lost}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* All Users Scores Table (including current user at the top) */}
@@ -196,7 +198,7 @@ const Board = () => {
             {scores.map((score, index) => (
               <tr
                 key={index}
-                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-500"}
+                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-600"}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {score.username}
@@ -214,6 +216,11 @@ const Board = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="my-25 py-5 text-right rounded-lg text-white">
+        <Link to="/battlefield">
+          <button>Back to Battlefield</button>
+        </Link>
       </div>
     </div>
   );

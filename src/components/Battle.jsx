@@ -1,3 +1,4 @@
+// Battle.jsx
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import "../App.css";
@@ -25,7 +26,13 @@ const Battle = ({ onUsernameChange }) => {
 
   useEffect(() => {
     onUsernameChange(username);
-  }, [onUsernameChange]);
+  }, [onUsernameChange, username]);
+
+  useEffect(() => {
+    fetchUserStats();
+    fetchPokemonData(selectedId, setSelectedPokemon); // Player's Pokémon
+    getNewPlayer(); // Bot's Pokémon
+  }, [selectedId]);
 
   // Function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
@@ -54,14 +61,44 @@ const Battle = ({ onUsernameChange }) => {
       );
       if (response.ok) {
         const data = await response.json();
-        setBattles_won(data.battles_won || 0);
-        setBattles_lost(data.battles_lost || 0);
-        setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
+        if (data.user) {
+          setBattles_won(data.battles_won || 0);
+          setBattles_lost(data.battles_lost || 0);
+          setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
+        } else {
+          await createNewScore(); // Create a new entry if none exists
+        }
       } else {
         console.error("Failed to fetch user data.");
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+    }
+  };
+
+  // Create a new score entry
+  const createNewScore = async () => {
+    try {
+      const response = await fetch("http://localhost:8081/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          battles_won: 0,
+          battles_lost: 0,
+          total_battles: 0,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("New score created successfully");
+        // Fetch updated user stats to reflect new entry
+        fetchUserStats();
+      } else {
+        console.error("Failed to create new score");
+      }
+    } catch (error) {
+      console.error("Error creating new score:", error);
     }
   };
 
@@ -93,18 +130,8 @@ const Battle = ({ onUsernameChange }) => {
       botStats.hp + botStats.attack * 2 + botStats.defense + botStats.speed;
 
     if (playerScore > botScore) {
-      setBattles_won((prevWins) => {
-        const newWins = prevWins + 1;
-        updateUserData(newWins, battles_lost);
-        return newWins;
-      });
       return "Player";
     } else {
-      setBattles_lost((prevLosses) => {
-        const newLosses = prevLosses + 1;
-        updateUserData(battles_won, newLosses);
-        return newLosses;
-      });
       return "Opponent";
     }
   };
@@ -125,7 +152,9 @@ const Battle = ({ onUsernameChange }) => {
         }
       );
 
-      if (!response.ok) {
+      if (response.ok) {
+        console.log("User data updated successfully");
+      } else {
         console.error("Failed to update user data");
       }
     } catch (error) {
@@ -148,6 +177,21 @@ const Battle = ({ onUsernameChange }) => {
     setTimeout(() => {
       const gameWinner = calculateWinner(selectedPokemon, botPokemon);
       setWinner(gameWinner);
+
+      if (gameWinner === "Player") {
+        setBattles_won((prevWins) => {
+          const newWins = prevWins + 1;
+          updateUserData(newWins, battles_lost);
+          return newWins;
+        });
+      } else {
+        setBattles_lost((prevLosses) => {
+          const newLosses = prevLosses + 1;
+          updateUserData(battles_won, newLosses);
+          return newLosses;
+        });
+      }
+
       setIsBattleOngoing(false);
       setIsAnimating(false);
       setIsBattleComplete(true);
@@ -174,13 +218,6 @@ const Battle = ({ onUsernameChange }) => {
     }
   };
 
-  // Initial load for player and bot Pokémon
-  useEffect(() => {
-    fetchUserStats();
-    fetchPokemonData(selectedId, setSelectedPokemon); // Player's Pokémon
-    getNewPlayer(); // Bot's Pokémon
-  }, [selectedId]); // Adjusted dependencies
-
   // Ensure selectedPokemon and botPokemon are loaded
   if (!selectedPokemon || !botPokemon) {
     return <div className="text-white text-center">Loading...</div>;
@@ -188,7 +225,7 @@ const Battle = ({ onUsernameChange }) => {
 
   return (
     <div className="bg-black min-h-screen flex flex-col items-center">
-      <div className="my-25 py-5 text-center rounded-lg text-white ">
+      <div className="my-25 py-5 text-center rounded-lg text-white">
         <h4>Hello, {username}!</h4>
         <h5 className="text-center mt-1">
           Ready to take action? Click "Attack" when you're set to go!
