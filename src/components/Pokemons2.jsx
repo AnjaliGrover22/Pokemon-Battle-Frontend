@@ -24,6 +24,9 @@ const Pokemons = () => {
           throw new Error("Failed to get pokemon list");
         }
         const data = await res.json();
+        console.log("Fetched Pokémon data:", data.results);
+        console.log("Total Pokémon count:", data.count);
+
         setPokemons(data.results);
         setTotalCount(data.count);
       } catch (error) {
@@ -75,22 +78,6 @@ const Pokemons = () => {
   const filteredPokemons = detailedPokemons.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Get the Pokémon to display on the current page
-  const displayedPokemons = filteredPokemons.slice(
-    (currentPage - 1) * pokemonsPerPage,
-    currentPage * pokemonsPerPage
-  );
-
-  // get specific stat value from stat array
-  const getStatValue = (stats, statName) => {
-    const stat = stats.find((stat) => stat.stat.name === statName);
-    return stat ? stat.base_stat : "N/A"; // Default to 'N/A' if not found
-  };
-  // Get the names of all types for the Pokémon
-  const getTypeNames = (types) => {
-    return types.map((typeObj) => typeObj.type.name).join(", "); // Join multiple types with commas
-  };
 
   // Clear search query
   const clearSearch = () => {
