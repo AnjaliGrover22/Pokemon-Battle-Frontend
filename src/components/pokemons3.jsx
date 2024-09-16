@@ -1,15 +1,18 @@
+// src/components/Pokemons.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CardView from "./Card2";
+import PokemonTypeFilter from "./PokemonTypeFilter.jsx"; // Adjust the path if necessary
 
 const Pokemons = () => {
   const [pokemons, setPokemons] = useState([]);
   const [detailedPokemons, setDetailedPokemons] = useState([]);
-  const [error, setError] = useState(null); // handle any errors
-  const [searchQuery, setSearchQuery] = useState(""); //search input
-  const [currentPage, setCurrentPage] = useState(1); // Pagination: Current page
-  const [totalCount, setTotalCount] = useState(0); // Total Pokémon count
-  const pokemonsPerPage = 48; // Display limit per page
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const pokemonsPerPage = 96;
   const navigate = useNavigate();
 
   // Fetch Pokémon data for the current page
@@ -24,9 +27,6 @@ const Pokemons = () => {
           throw new Error("Failed to get pokemon list");
         }
         const data = await res.json();
-        console.log("Fetched Pokémon data:", data.results);
-        console.log("Total Pokémon count:", data.count);
-
         setPokemons(data.results);
         setTotalCount(data.count);
       } catch (error) {
@@ -66,27 +66,35 @@ const Pokemons = () => {
 
   const handleSelectClick = (id) => {
     console.log(`Selected Pokemon ID: ${id}`);
+    navigate(`/battlefield/id/${id}`);
   };
 
-  // Pagination: Handle page navigation
-  const totalPages = Math.ceil(totalCount / pokemonsPerPage);
-  const nextPage = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  // Handle type toggle
+  const handleTypeToggle = (type) => {
+    setSelectedTypes((prevTypes) =>
+      prevTypes.includes(type)
+        ? prevTypes.filter((t) => t !== type)
+        : [...prevTypes, type]
+    );
+  };
 
-  // Filter Pokémon based on search query
-  const filteredPokemons = detailedPokemons.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter Pokémon based on search query and selected types
+  const filteredPokemons = detailedPokemons
+    .filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter(
+      (pokemon) =>
+        selectedTypes.length === 0 ||
+        pokemon.types.some((t) => selectedTypes.includes(t.type.name))
+    );
 
-  // Clear search query
   const clearSearch = () => {
     setSearchQuery("");
   };
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / pokemonsPerPage);
 
   return (
     <div className="w-full bg-black">
@@ -100,7 +108,6 @@ const Pokemons = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 w-80 rounded-md border border-gray-300 pr-10"
           />
-
           {searchQuery && (
             <button
               onClick={clearSearch}
@@ -112,6 +119,12 @@ const Pokemons = () => {
           )}
         </div>
       </div>
+
+      {/* Pokémon Type Filter */}
+      <PokemonTypeFilter
+        selectedTypes={selectedTypes}
+        onTypeToggle={handleTypeToggle}
+      />
 
       {/* Pagination Controls */}
       <div className="flex justify-center mb-4">

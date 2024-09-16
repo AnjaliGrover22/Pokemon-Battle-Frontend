@@ -1,12 +1,12 @@
 // src/App.jsx
 import "./App.css";
 import MainLayout from "./components/MainLayout";
-import Pokemons from "./components/Pokemons2";
+//import Pokemons from "./components/Pokemons2";
 import PokemonDetails from "./components/PokemonDetails2";
 import Battle from "./components/Battle";
 import UsernameForm from "./components/UsernameForm";
 import Board from "./components/Board";
-//import Pokemons from "./components/pokemons3";
+import Pokemons from "./components/pokemons3";
 
 import {
   createBrowserRouter,
