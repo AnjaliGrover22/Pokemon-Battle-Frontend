@@ -21,15 +21,13 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<MainLayout />}>
-
         <Route index element={<Pokemons />} />
-      
+
         <Route path="/pokemons/:id" element={<PokemonDetails />} />
 
         <Route index element={<div>Put all pokemon element route here</div>} />
-        <Route path="battlefield" element={<Battle />} />
+        <Route path="battlefield/id/:id" element={<Battle />} />
         <Route path="battlefield/board" element={<Board />} />
-
       </Route>
     )
   );

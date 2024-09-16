@@ -166,7 +166,7 @@ const Board = () => {
             {scores.map((score, index) => (
               <tr
                 key={index}
-                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-600"}
+                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-400"}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {score.username}
