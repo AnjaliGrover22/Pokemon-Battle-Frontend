@@ -2,26 +2,23 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import UsernameForm from "./UsernameForm"; // Ensure this matches your filename
+import UsernameForm from "./UsernameForm";
+import "../App.css";
 
 const MainLayout = () => {
   const [battleCount, setBattleCount] = useState(0);
   const [battles_won, setBattles_won] = useState(0);
   const [battles_lost, setBattles_lost] = useState(0);
-  const [username, setUsername] = useState(""); // Start with an empty username
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
   const handleSetUsername = (newUsername) => {
-    console.log("Username submitted:", newUsername); // Debugging line
     setUsername(newUsername);
     navigate("/battlefield");
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
-      {
-        console.log("Username:", username);
-      }
       if (username) {
         try {
           const response = await fetch(
@@ -46,24 +43,26 @@ const MainLayout = () => {
   }, [username]);
 
   return (
-    <div>
+    <div className="layout-container">
       <Header />
-      {username ? (
-        <Outlet
-          context={{
-            battleCount,
-            setBattleCount,
-            battles_won,
-            setBattles_won,
-            battles_lost,
-            setBattles_lost,
-            username,
-            setUsername,
-          }}
-        />
-      ) : (
-        <UsernameForm onSetUsername={handleSetUsername} />
-      )}
+      <div className="content-wrapper">
+        {username ? (
+          <Outlet
+            context={{
+              battleCount,
+              setBattleCount,
+              battles_won,
+              setBattles_won,
+              battles_lost,
+              setBattles_lost,
+              username,
+              setUsername,
+            }}
+          />
+        ) : (
+          <UsernameForm onSetUsername={handleSetUsername} />
+        )}
+      </div>
       <Footer />
     </div>
   );
