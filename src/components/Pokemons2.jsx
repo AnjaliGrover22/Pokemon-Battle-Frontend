@@ -72,6 +72,7 @@ const Pokemons = () => {
 
   const handleSelectClick = (id) => {
     console.log(`Selected Pokemon ID: ${id}`);
+    navigate(`/battlefield/id/${id}`);
   };
 
   // Pagination: Handle page navigation

@@ -14,7 +14,7 @@ const MainLayout = () => {
 
   const handleSetUsername = (newUsername) => {
     setUsername(newUsername);
-    navigate("/battlefield");
+    // navigate("/battlefield");
   };
 
   useEffect(() => {
