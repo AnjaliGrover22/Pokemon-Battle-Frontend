@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import "../App.css";
 
 const Battle = ({ onUsernameChange }) => {
@@ -13,7 +13,8 @@ const Battle = ({ onUsernameChange }) => {
     username,
   } = useOutletContext();
 
-  const selectedId = 3; // Player's selected Pokémon ID (hardcoded for now)
+  const { id } = useParams();
+
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);
   const [winner, setWinner] = useState(null);

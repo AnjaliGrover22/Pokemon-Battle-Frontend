@@ -5,7 +5,7 @@ import Footer from "./Footer";
 import UsernameForm from "./UsernameForm";
 import "../App.css";
 
-const MainLayout = ({ username, onUsernameChange }) => {
+const MainLayout = ({ username, onUsernameChange, id }) => {
   const [battleCount, setBattleCount] = useState(0);
   const [battles_won, setBattles_won] = useState(0);
   const [battles_lost, setBattles_lost] = useState(0);
@@ -53,7 +53,7 @@ const MainLayout = ({ username, onUsernameChange }) => {
 
   return (
     <div className="layout-container">
-      <Header loginame={loginame} />
+      <Header loginame={loginame} id={selectedId} />
       <div className={username ? "w-full" : "content-wrapper"}>
         {showForm ? (
           <UsernameForm onSetUsername={handleSetUsername} />
@@ -67,7 +67,8 @@ const MainLayout = ({ username, onUsernameChange }) => {
               battles_lost,
               setBattles_lost,
               username,
-              setUsername: onUsernameChange, // Use the passed-in function
+              setUsername: onUsernameChange,
+              id, // Use the passed-in function
             }}
           />
         )}
