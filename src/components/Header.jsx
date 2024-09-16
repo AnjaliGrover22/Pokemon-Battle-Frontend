@@ -12,7 +12,7 @@ const Header = ({ loginame, battleid }) => {
         </div>
         <div className="text-right flex gap-6 text-lg">
           <Link to="/">Home</Link>
-          <Link
+          {/* <Link
             to={
               battleid
                 ? `/battlefield/id/${battleid}`
@@ -20,8 +20,9 @@ const Header = ({ loginame, battleid }) => {
             }
           >
             Battle
-          </Link>
-          <Link to="/battlefield/board">Score Board</Link>
+          </Link> */}
+          <Link to="/battlefield/board">Scores</Link>
+          <Link to="/logout">Logout</Link>
         </div>
       </div>
     </>

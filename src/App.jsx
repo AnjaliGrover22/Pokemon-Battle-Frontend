@@ -15,6 +15,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { useState } from "react";
+import LogOut from "./components/LogOut";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -46,6 +47,7 @@ function App() {
           element={<Battle onUsernameChange={handleUsernameChange} />}
         />
         <Route path="battlefield/board" element={<Board />} />
+        <Route path="/logout" element={<LogOut />} />
       </Route>
     )
   );
