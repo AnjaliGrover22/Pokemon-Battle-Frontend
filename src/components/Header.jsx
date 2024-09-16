@@ -13,6 +13,10 @@ const Header = () => {
           <span>Choose your favourite</span>
           <span>Fantastic playground</span>
         </div>
+
+        <div className="text-right text-2xl rounded mx-16 py-16 font-bold">
+          <Link to="/battlefield/board">Score Board</Link>
+        </div>
       </div>
     </>
   );
