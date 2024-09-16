@@ -1,5 +1,6 @@
 // components/UsernameForm.jsx
 import { useState } from "react";
+import "../App.css";
 
 const UsernameForm = ({ onSetUsername }) => {
   const [input, setInput] = useState("");
@@ -13,25 +14,30 @@ const UsernameForm = ({ onSetUsername }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="text-center mt-6">
-      <label htmlFor="username" className="text-lg text-white">
-        Enter your username:
-      </label>
-      <input
-        id="username"
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        className="ml-2 p-2"
-        placeholder="Username"
-      />
-      <button
-        type="submit"
-        className="ml-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-      >
-        Submit
-      </button>
-    </form>
+    <div className="centered-component">
+      <div className="container">
+        <h1 className="title">Welcome to the Pokearena</h1>
+        <form onSubmit={handleSubmit} className="form">
+          <label htmlFor="username" className="label">
+            Please Enter Your Username:
+          </label>
+          <input
+            id="username"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="input"
+            placeholder="Your Name"
+          />
+          <button type="submit" className="button">
+            Submit
+          </button>
+        </form>
+        <div class="image-container">
+          <img src="/front_img.png" alt="Pikachu" className="pikachu-image" />
+        </div>
+      </div>
+    </div>
   );
 };
 
