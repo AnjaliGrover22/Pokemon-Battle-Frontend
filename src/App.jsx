@@ -6,6 +6,7 @@ import PokemonDetails from "./components/PokemonDetails2";
 import Battle from "./components/Battle";
 import UsernameForm from "./components/UsernameForm";
 import Board from "./components/Board";
+//import Pokemons from "./components/pokemons3";
 
 import {
   createBrowserRouter,
@@ -21,15 +22,13 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<MainLayout />}>
-
         <Route index element={<Pokemons />} />
-      
+
         <Route path="/pokemons/:id" element={<PokemonDetails />} />
 
         <Route index element={<div>Put all pokemon element route here</div>} />
         <Route path="battlefield" element={<Battle />} />
         <Route path="battlefield/board" element={<Board />} />
-
       </Route>
     )
   );
