@@ -9,6 +9,7 @@ const Pokemons = () => {
   const [searchQuery, setSearchQuery] = useState(""); //search input
   const [currentPage, setCurrentPage] = useState(1); // Pagination: Current page
   const [totalCount, setTotalCount] = useState(0); // Total Pokémon count
+
   const pokemonsPerPage = 48; // Display limit per page
   const navigate = useNavigate();
 
@@ -16,9 +17,14 @@ const Pokemons = () => {
   useEffect(() => {
     const getPokemons = async () => {
       try {
-        const url = `https://pokeapi.co/api/v2/pokemon?limit=${pokemonsPerPage}&offset=${
-          (currentPage - 1) * pokemonsPerPage
-        }`;
+        let url;
+        if (searchQuery) {
+          url = `https://pokeapi.co/api/v2/pokemon/${searchQuery}`;
+        } else {
+          url = `https://pokeapi.co/api/v2/pokemon?limit=100000`;
+        }
+        // add reagan's code for page navigation
+
         const res = await fetch(url);
         if (!res.ok) {
           throw new Error("Failed to get pokemon list");
