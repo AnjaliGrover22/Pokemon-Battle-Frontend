@@ -16,7 +16,7 @@ const UsernameForm = ({ onSetUsername }) => {
   return (
     <div className="centered-component">
       <div className="container">
-        <h1 className="title">Welcome to the Pokearena</h1>
+        <h1 className="title">Welcome to the PokeArena</h1>
         <form onSubmit={handleSubmit} className="form">
           <label htmlFor="username" className="label">
             Please Enter Your Username:
