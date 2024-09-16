@@ -19,16 +19,34 @@ import { useState } from "react";
 function App() {
   const [username, setUsername] = useState("");
 
+  const handleUsernameChange = (username) => {
+    setUsername(username);
+  };
+
+  console.log("In my App.jsx", username);
+
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<MainLayout />}>
+      <Route
+        path="/"
+        element={
+          <MainLayout
+            username={username}
+            onUsernameChange={handleUsernameChange}
+          />
+        }
+      >
         <Route index element={<Pokemons />} />
 
         <Route path="/pokemons/:id" element={<PokemonDetails />} />
 
         <Route index element={<div>Put all pokemon element route here</div>} />
-        <Route path="battlefield/id/:id" element={<Battle />} />
+        <Route
+          path="battlefield/id/:id"
+          element={<Battle onUsernameChange={handleUsernameChange} />}
+        />
         <Route path="battlefield/board" element={<Board />} />
+        <Route path="/username" element={<UsernameForm />} />
       </Route>
     )
   );
