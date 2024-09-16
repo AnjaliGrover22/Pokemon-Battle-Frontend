@@ -41,6 +41,11 @@ const PokemonDetails = () => {
     return stat ? stat.base_stat : "N/A"; // Default to 'N/A' if not found
   };
 
+  const handleSelectClick = (id) => {
+    console.log(`Selected Pokemon ID: ${id}`);
+    navigate(`/battlefield/id/${id}`);
+  };
+
   // Get the names of all types for the Pokémon
   const getTypeNames = (types) => {
     return types.map((typeObj) => typeObj.type.name).join(", "); // Join multiple types with commas
@@ -75,7 +80,7 @@ const PokemonDetails = () => {
           { label: "Close", onClick: () => navigate(-1) },
           {
             label: "Select",
-            onClick: () => console.log(`Selected Pokemon ID: ${pokemon.id}`),
+            onClick: () => handleSelectClick(pokemon.id),
           },
         ]}
         size="large"
