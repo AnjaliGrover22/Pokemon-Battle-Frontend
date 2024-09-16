@@ -46,7 +46,6 @@ function App() {
           element={<Battle onUsernameChange={handleUsernameChange} />}
         />
         <Route path="battlefield/board" element={<Board />} />
-        <Route path="/username" element={<UsernameForm />} />
       </Route>
     )
   );

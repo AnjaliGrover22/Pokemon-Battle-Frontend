@@ -134,11 +134,39 @@ const Board = () => {
     <div className="bg-black min-h-screen p-8 text-white">
       {/* Current User Stats Section */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Score Board</h1>
-        <p className="text-xl mb-2">User: {username || "Not logged in"}</p>
-        <p className="text-xl mb-2">Total Battles: {battleCount}</p>
-        <p className="text-xl mb-2">Battles Won: {battles_won}</p>
-        <p className="text-xl">Battles Lost: {battles_lost}</p>
+        <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
+          Score Board
+        </h1>
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+          <table className="w-full border-collapse">
+            <tbody>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 rounded-tl-lg">
+                  User:
+                </th>
+                <td className="p-4 text-lg">{username || "Not logged in"}</td>
+              </tr>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700">
+                  Total Battles:
+                </th>
+                <td className="p-4 text-lg">{battleCount}</td>
+              </tr>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700">
+                  Battles Won:
+                </th>
+                <td className="p-4 text-lg">{battles_won}</td>
+              </tr>
+              <tr>
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 rounded-bl-lg">
+                  Battles Lost:
+                </th>
+                <td className="p-4 text-lg">{battles_lost}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* All Users Scores Table (including current user at the top) */}

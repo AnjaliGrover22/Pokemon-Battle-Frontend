@@ -14,6 +14,7 @@ const Battle = ({ onUsernameChange }) => {
   } = useOutletContext();
 
   const { id } = useParams();
+  const selectedId = id || 3;
 
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);

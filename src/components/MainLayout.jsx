@@ -1,11 +1,12 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import UsernameForm from "./UsernameForm";
 import "../App.css";
 
-const MainLayout = ({ username, onUsernameChange, id }) => {
+const MainLayout = ({ username, onUsernameChange }) => {
+  const { id } = useParams();
   const [battleCount, setBattleCount] = useState(0);
   const [battles_won, setBattles_won] = useState(0);
   const [battles_lost, setBattles_lost] = useState(0);
@@ -53,7 +54,7 @@ const MainLayout = ({ username, onUsernameChange, id }) => {
 
   return (
     <div className="layout-container">
-      <Header loginame={loginame} id={selectedId} />
+      <Header loginame={loginame} id={id} />
       <div className={username ? "w-full" : "content-wrapper"}>
         {showForm ? (
           <UsernameForm onSetUsername={handleSetUsername} />
