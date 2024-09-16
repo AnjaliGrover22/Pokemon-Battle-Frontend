@@ -224,7 +224,7 @@ const Battle = () => {
             src={botPokemon.sprites.other.home.front_default}
             alt={botPokemon.name}
             className={`w-96 h-96 object-contain mb-2 ${
-              isAnimating ? "animate-heavy-shake animate-move-left" : ""
+              isAnimating ? "animate-heavy-shake animate-move-right" : ""
             }`}
           />
         </div>

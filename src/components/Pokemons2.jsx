@@ -120,6 +120,43 @@ const Pokemons = () => {
         </div>
       </div>
 
+      {/* Pagination Controls */}
+      <div className="flex justify-center mb-4">
+        {currentPage !== 1 && (
+          <button
+            onClick={() => setCurrentPage(1)}
+            className="mx-1 p-2 bg-gray-700 text-white rounded"
+          >
+            First
+          </button>
+        )}
+        {Array.from({ length: totalPages }, (_, index) => index + 1)
+          .slice(
+            Math.max(0, Math.min(currentPage - 2, totalPages - 3)),
+            Math.max(3, Math.min(totalPages, currentPage + 1))
+          )
+          .map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`mx-1 p-2 rounded ${
+                currentPage === page
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-700 text-white"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+        <button
+          onClick={() => setCurrentPage(totalPages)}
+          disabled={currentPage === totalPages}
+          className="mx-1 p-2 bg-gray-700 text-white rounded"
+        >
+          Last
+        </button>
+      </div>
+
       {/* Pokémon Cards */}
       <div className="grid grid-cols-6 gap-4 justify-center px-4">
         {filteredPokemons.length > 0 ? (
