@@ -1,20 +1,22 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import UsernameForm from "./UsernameForm";
 import "../App.css";
 
-const MainLayout = () => {
+const MainLayout = ({ username, onUsernameChange }) => {
+  const { id } = useParams();
   const [battleCount, setBattleCount] = useState(0);
   const [battles_won, setBattles_won] = useState(0);
   const [battles_lost, setBattles_lost] = useState(0);
-  const [username, setUsername] = useState("");
   const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(!username); // Initial state depends on whether username exists
 
+  // Use the passed in onUsernameChange to update the username state
   const handleSetUsername = (newUsername) => {
-    setUsername(newUsername);
-    // navigate("/battlefield");
+    onUsernameChange(newUsername);
+    setShowForm(false); // Hide the form after setting the username
   };
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const MainLayout = () => {
           );
           if (response.ok) {
             const data = await response.json();
-            setUsername(data.username || username);
+            onUsernameChange(data.username || username);
             setBattles_won(data.battles_won || 0);
             setBattles_lost(data.battles_lost || 0);
             setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
@@ -40,13 +42,23 @@ const MainLayout = () => {
     };
 
     fetchUserData();
+  }, [username, onUsernameChange]);
+
+  // Update `showForm` based on username changes
+  useEffect(() => {
+    setShowForm(!username);
   }, [username]);
+
+  const loginame = username;
+  console.log("login name", loginame);
 
   return (
     <div className="layout-container">
-      <Header />
-      <div className="content-wrapper">
-        {username ? (
+      <Header loginame={loginame} id={id} />
+      <div className={username ? "w-full" : "content-wrapper"}>
+        {showForm ? (
+          <UsernameForm onSetUsername={handleSetUsername} />
+        ) : (
           <Outlet
             context={{
               battleCount,
@@ -56,11 +68,10 @@ const MainLayout = () => {
               battles_lost,
               setBattles_lost,
               username,
-              setUsername,
+              setUsername: onUsernameChange,
+              id, // Use the passed-in function
             }}
           />
-        ) : (
-          <UsernameForm onSetUsername={handleSetUsername} />
         )}
       </div>
       <Footer />

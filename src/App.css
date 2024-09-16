@@ -1,6 +1,6 @@
 /* Center the Pokémon images : Battle.jsx*/
 .pokemon-image {
-  position: absolute;
+  position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -71,6 +71,7 @@
 html,
 body {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
   background-color: #000; /* Black background */
@@ -83,11 +84,6 @@ body {
   min-height: 100vh; /* Full height of viewport */
 }
 
-.header,
-.footer {
-  /* Ensure your Header and Footer styles are here */
-}
-
 .content-wrapper {
   flex: 1;
   display: flex;
@@ -98,7 +94,7 @@ body {
 }
 
 .centered-component {
-  width: 50%; /* Adjust as needed */
+  width: 80%; /* Adjust as needed */
   max-width: 600px; /* Optional: Set a max width */
   height: auto; /* Adjust based on content */
   background-color: lightgray; /* Adjust as needed */

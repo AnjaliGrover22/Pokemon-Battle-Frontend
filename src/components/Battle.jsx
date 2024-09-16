@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import "../App.css";
 
-const Battle = () => {
+const Battle = ({ onUsernameChange }) => {
   const {
     battleCount,
     setBattleCount,
@@ -14,14 +14,18 @@ const Battle = () => {
   } = useOutletContext();
 
   const { id } = useParams();
+  const selectedId = id || 3;
 
-  const selectedId = id; // Player's selected Pokémon ID (hardcoded for now)
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [botPokemon, setBotPokemon] = useState(null);
   const [winner, setWinner] = useState(null);
   const [isBattleOngoing, setIsBattleOngoing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isBattleComplete, setIsBattleComplete] = useState(false);
+
+  useEffect(() => {
+    onUsernameChange(username);
+  }, [onUsernameChange]);
 
   // Function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
@@ -184,8 +188,11 @@ const Battle = () => {
 
   return (
     <div className="bg-black min-h-screen flex flex-col items-center">
-      <div className="my-25 py-5 text-right rounded-lg text-white">
-        <h5>Welcome {username}</h5>
+      <div className="my-25 py-5 text-center rounded-lg text-white ">
+        <h4>Hello, {username}!</h4>
+        <h5 className="text-center mt-1">
+          Ready to take action? Click "Attack" when you're set to go!
+        </h5>
       </div>
       {/* Title */}
       <div className="text-center text-white text-3xl font-semibold mt-6">

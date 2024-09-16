@@ -1,4 +1,4 @@
-// components/UsernameForm.jsx
+// UsernameForm.jsx
 import { useState } from "react";
 import "../App.css";
 
@@ -33,7 +33,7 @@ const UsernameForm = ({ onSetUsername }) => {
             Submit
           </button>
         </form>
-        <div class="image-container">
+        <div className="image-container">
           <img src="/front_img.png" alt="Pikachu" className="pikachu-image" />
         </div>
       </div>
