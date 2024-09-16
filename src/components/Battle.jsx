@@ -204,7 +204,7 @@ const Battle = () => {
             src={selectedPokemon.sprites.other.home.front_default}
             alt={selectedPokemon.name}
             className={`w-96 h-96 object-contain mb-2 ${
-              isAnimating ? "animate-heavy-shake animate-move-left" : ""
+              isAnimating ? "animate-heavy-shake animate-move-right" : ""
             }`}
           />
         </div>
