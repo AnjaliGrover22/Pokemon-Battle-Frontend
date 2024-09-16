@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -6,14 +6,13 @@ import UsernameForm from "./UsernameForm";
 import "../App.css";
 
 const MainLayout = ({ username, onUsernameChange }) => {
-  const { id } = useParams();
   const [battleCount, setBattleCount] = useState(0);
   const [battles_won, setBattles_won] = useState(0);
   const [battles_lost, setBattles_lost] = useState(0);
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(!username); // Initial state depends on whether username exists
 
-  // Use the passed in onUsernameChange to update the username state
+  // Use the passed-in onUsernameChange to update the username state
   const handleSetUsername = (newUsername) => {
     onUsernameChange(newUsername);
     setShowForm(false); // Hide the form after setting the username
@@ -49,12 +48,10 @@ const MainLayout = ({ username, onUsernameChange }) => {
     setShowForm(!username);
   }, [username]);
 
-  const loginame = username;
-  console.log("login name", loginame);
-
   return (
     <div className="layout-container">
-      <Header loginame={loginame} id={id} />
+      {/* Adjust Header to accept `id` if required */}
+      <Header loginame={username} />
       <div className={username ? "w-full" : "content-wrapper"}>
         {showForm ? (
           <UsernameForm onSetUsername={handleSetUsername} />
@@ -69,7 +66,7 @@ const MainLayout = ({ username, onUsernameChange }) => {
               setBattles_lost,
               username,
               setUsername: onUsernameChange,
-              id, // Use the passed-in function
+              // Pass `id` from the route if required, otherwise, omit this
             }}
           />
         )}

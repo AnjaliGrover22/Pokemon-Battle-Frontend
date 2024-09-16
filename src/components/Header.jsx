@@ -6,7 +6,7 @@ const Header = ({ loginame, battleid }) => {
   return (
     <>
       {/* Top bar */}
-      <div className=" text-xs py-2 px-24 flex justify-between items-center h-16 bg-red-400 text-white">
+      <div className=" text-xs py-2 px-24 flex justify-between items-center h-16 bg-red-500 text-white">
         <div className="text-2xl font-bold">
           <Link to="/">{loginame ? `Welcome: ${loginame}` : "PokeArena"}</Link>
         </div>

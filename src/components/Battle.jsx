@@ -254,7 +254,7 @@ const Battle = ({ onUsernameChange }) => {
       {/* Button to start a new game */}
       <button
         onClick={startNewGame}
-        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
+        className="mt-6 px-4 py-2 bg-red-500 text-white rounded"
         disabled={isBattleOngoing}
       >
         Attack
@@ -262,7 +262,7 @@ const Battle = ({ onUsernameChange }) => {
       {!isBattleOngoing && winner && (
         <button
           onClick={getNewPlayer}
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded"
+          className="mt-6 px-4 py-2 bg-red-500 text-white rounded"
         >
           Change opponent
         </button>

@@ -138,7 +138,7 @@ body {
 }
 
 .button {
-  background-color: #fc8181;
+  background-color: #e53e3e;
   color: #ffffff;
   padding: 10px 20px;
   font-size: 1rem;
@@ -149,7 +149,9 @@ body {
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background-color: #f56565; /* Change background color on hover */
+  color: white; /* Ensure text color remains white */
+  border: 2px solid #f56565;
 }
 
 .pikachu-image {

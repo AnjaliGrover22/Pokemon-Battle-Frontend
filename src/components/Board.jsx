@@ -141,32 +141,34 @@ const Board = () => {
           <table className="w-full border-collapse">
             <tbody>
               <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 rounded-tl-lg">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
                   User:
                 </th>
-                <td className="p-4 text-lg">{username || "Not logged in"}</td>
+                <td className="p-4 text-lg w-3/4">
+                  {username || "Not logged in"}
+                </td>
               </tr>
               <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
                   Total Battles:
                 </th>
-                <td className="p-4 text-lg">{battleCount}</td>
+                <td className="p-4 text-lg w-3/4">{battleCount}</td>
               </tr>
               <tr className="border-b border-gray-600">
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
                   Battles Won:
                 </th>
-                <td className="p-4 text-lg">{battles_won}</td>
+                <td className="p-4 text-lg w-3/4">{battles_won}</td>
               </tr>
               <tr>
-                <th className="text-left text-lg font-semibold p-4 bg-gray-700 rounded-bl-lg">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
                   Battles Lost:
                 </th>
-                <td className="p-4 text-lg">{battles_lost}</td>
+                <td className="p-4 text-lg w-3/4">{battles_lost}</td>
               </tr>
             </tbody>
           </table>
-        </div>
+        </div>{" "}
       </div>
 
       {/* All Users Scores Table (including current user at the top) */}
@@ -194,7 +196,7 @@ const Board = () => {
             {scores.map((score, index) => (
               <tr
                 key={index}
-                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-400"}
+                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-500"}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {score.username}
@@ -212,11 +214,6 @@ const Board = () => {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="my-25 py-5 text-right rounded-lg text-white">
-        <Link to="/battlefield">
-          <button>Back to Battlefield</button>
-        </Link>
       </div>
     </div>
   );
