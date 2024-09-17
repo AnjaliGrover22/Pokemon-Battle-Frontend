@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 
 const Board = () => {
   const { battleCount, battles_won, battles_lost, username } =
     useOutletContext();
   const [scores, setScores] = useState([]);
   const [userScore, setUserScore] = useState(null);
+
+  console.log("vals", battleCount, battles_won, battles_lost, username);
 
   // Fetch all scores when the component mounts
   useEffect(() => {
@@ -23,8 +25,10 @@ const Board = () => {
   const fetchAllScores = async () => {
     try {
       const response = await fetch("http://localhost:8081/api/scores");
+
       if (response.ok) {
         const data = await response.json();
+        console.log("fetched data", data);
         setScores(data); // Set the scores list from the API
       } else {
         console.error("Failed to fetch all scores");
@@ -40,16 +44,20 @@ const Board = () => {
       const response = await fetch(
         `http://localhost:8081/api/scores/${username}`
       );
+
       const data = await response.json();
 
+      //need to check issue from here : No user found in console
+      console.log("data", data);
+
       if (response.ok) {
-        if (data.user) {
+        if (data.username) {
           // User exists, update the score
           const userScoreData = {
-            username: data.user.username,
-            total_battles: data.user.total_battles + battleCount,
-            battles_won: data.user.battles_won + battles_won,
-            battles_lost: data.user.battles_lost + battles_lost,
+            username: data.username,
+            total_battles: data.total_battles + battleCount,
+            battles_won: data.battles_won + battles_won,
+            battles_lost: data.battles_lost + battles_lost,
           };
           setUserScore(userScoreData);
           await updateBattleData(userScoreData);
@@ -93,6 +101,12 @@ const Board = () => {
   // Create a new score entry for the user
   const createNewScore = async () => {
     try {
+      console.log(
+        "my new entries",
+        username,
+        total_battles_battles_won,
+        battles_lost
+      );
       const response = await fetch("http://localhost:8081/api/scores", {
         method: "POST",
         headers: {

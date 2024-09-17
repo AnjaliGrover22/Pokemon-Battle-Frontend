@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 
 const Header = ({ loginame, battleid }) => {
-  console.log("my header id", battleid);
-  const defaultBattleId = 7;
   return (
     <>
       {/* Top bar */}
