@@ -65,8 +65,30 @@ const Board = () => {
           // User does not exist, create a new score
           await createNewScore();
         }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(
+          "Error fetching user score:",
+          errorData.message || "Unknown error"
+        );
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.user) {
+        // User exists, update the score
+        const userScoreData = {
+          username: data.user.username,
+          total_battles: data.user.total_battles + battleCount,
+          battles_won: data.user.battles_won + battles_won,
+          battles_lost: data.user.battles_lost + battles_lost,
+        };
+        setUserScore(userScoreData);
+        await updateBattleData(userScoreData);
       } else {
-        console.error("Error fetching user score:", data.message);
+        // User does not exist, create a new score
+        await createNewScore();
       }
     } catch (error) {
       console.error("Error checking user score:", error);
@@ -105,6 +127,10 @@ const Board = () => {
         "my new entries",
         username,
         total_battles_battles_won,
+        "posting new",
+        username,
+        battleCount,
+        battles_won,
         battles_lost
       );
       const response = await fetch("http://localhost:8081/api/scores", {
