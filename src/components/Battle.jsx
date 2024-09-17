@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
 
 const Battle = ({ onUsernameChange }) => {
@@ -23,8 +23,10 @@ const Battle = ({ onUsernameChange }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isBattleComplete, setIsBattleComplete] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    onUsernameChange(username);
+    if (username) onUsernameChange(username);
   }, [onUsernameChange, username]);
 
   useEffect(() => {
@@ -98,23 +100,30 @@ const Battle = ({ onUsernameChange }) => {
 
   const updateUserData = async (username, newWins, newLosses) => {
     try {
+      const requestBody = {
+        battles_won: newWins,
+        battles_lost: newLosses,
+        total_battles: newWins + newLosses,
+      };
+
+      console.log("Request body:", requestBody); // Log request body
+
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`, // Include username in the URL
+        `http://localhost:8081/api/scores/${username}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            battles_won: newWins,
-            battles_lost: newLosses,
-            total_battles: newWins + newLosses,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
+
+      const responseData = await response.json();
+      console.log("Response data:", responseData); // Log response data
 
       if (response.ok) {
         console.log("User data updated successfully");
       } else {
-        console.error("Failed to update user data");
+        console.error("Failed to update user data:", responseData);
       }
     } catch (error) {
       console.error("Error updating user data:", error);
@@ -178,6 +187,10 @@ const Battle = ({ onUsernameChange }) => {
   if (!selectedPokemon || !botPokemon) {
     return <div className="text-white text-center">Loading...</div>;
   }
+
+  const getScores = () => {
+    navigate(`/battlefield/board/${username}`);
+  };
 
   return (
     <div className="bg-black min-h-screen flex flex-col items-center">
@@ -244,6 +257,14 @@ const Battle = ({ onUsernameChange }) => {
           className="mt-6 px-4 py-2 bg-red-500 text-white rounded button"
         >
           Change opponent
+        </button>
+      )}
+      {winner && (
+        <button
+          onClick={getScores}
+          className="mt-6 px-4 py-2 bg-red-500 text-white rounded button"
+        >
+          Check your Scores
         </button>
       )}
     </div>

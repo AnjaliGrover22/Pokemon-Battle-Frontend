@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Header = ({ loginame }) => {
+const Header = ({ loginame, battleid }) => {
   return (
     <>
       {/* Top bar */}
