@@ -46,7 +46,7 @@ function App() {
           path="battlefield/id/:id"
           element={<Battle onUsernameChange={handleUsernameChange} />}
         />
-        <Route path="battlefield/board/:username" element={<Board />} />
+        <Route path="battlefield/board" element={<Board />} />
         <Route path="/logout" element={<LogOut />} />
       </Route>
     )

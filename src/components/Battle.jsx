@@ -189,7 +189,7 @@ const Battle = ({ onUsernameChange }) => {
   }
 
   const getScores = () => {
-    navigate(`/battlefield/board/${username}`);
+    navigate(`/battlefield/board/`);
   };
 
   return (

@@ -10,7 +10,11 @@ const Header = ({ loginame, battleid }) => {
         </div>
         <div className="text-right flex gap-6 text-lg">
           <Link to="/">Home</Link>
-          <Link to="/battlefield/board">Scores</Link>
+          {loginame ? (
+            <Link to={`/battlefield/board`}>Scores</Link>
+          ) : (
+            <span className="text-gray-500 cursor-not-allowed">Scores</span>
+          )}
           <Link to="/logout">Logout</Link>
         </div>
       </div>
