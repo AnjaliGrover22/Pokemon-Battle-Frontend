@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext, Link } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 const Board = () => {
   const { battleCount, battles_won, battles_lost, username } =
@@ -7,18 +7,19 @@ const Board = () => {
   const [scores, setScores] = useState([]);
   const [userScore, setUserScore] = useState(null);
 
-  // Fetch all scores when component mounts
+  // Fetch all scores when the component mounts
   useEffect(() => {
     fetchAllScores();
   }, []);
 
-  // Update user score and battle data whenever username, battleCount, battles_won, or battles_lost changes
+  // Fetch or update user score when relevant data changes
   useEffect(() => {
     if (username) {
-      getScoreBoardByUsername();
+      checkUserScore();
     }
   }, [username, battleCount, battles_won, battles_lost]);
 
+  // Fetch all scores from the server
   const fetchAllScores = async () => {
     try {
       const response = await fetch("http://localhost:8081/api/scores");
@@ -33,7 +34,8 @@ const Board = () => {
     }
   };
 
-  const getScoreBoardByUsername = async () => {
+  // Check if user score exists and update or create accordingly
+  const checkUserScore = async () => {
     try {
       const response = await fetch(
         `http://localhost:8081/api/scores/${username}`
@@ -42,51 +44,53 @@ const Board = () => {
 
       if (response.ok) {
         if (data.user) {
+          // User exists, update the score
           const userScoreData = {
             username: data.user.username,
-            total_battles: battleCount,
-            battles_won,
-            battles_lost,
+            total_battles: data.user.total_battles + battleCount,
+            battles_won: data.user.battles_won + battles_won,
+            battles_lost: data.user.battles_lost + battles_lost,
           };
-          setUserScore(userScoreData); // Update local state with user-specific data
-          await updateBattleData(); // Update user-specific data if found
+          setUserScore(userScoreData);
+          await updateBattleData(userScoreData);
         } else {
-          await createNewScore(); // Create new score if user not found
+          // User does not exist, create a new score
+          await createNewScore();
         }
       } else {
         console.error("Error fetching user score:", data.message);
       }
     } catch (error) {
-      console.error("Error in checking username:", error);
+      console.error("Error checking user score:", error);
     }
   };
 
-  const updateBattleData = async () => {
+  // Update existing user score
+  const updateBattleData = async (userScoreData) => {
     try {
-      const response = await fetch("http://localhost:8081/api/scores", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          total_battles: battleCount,
-          battles_won,
-          battles_lost,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:8081/api/scores/${username}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userScoreData),
+        }
+      );
+
       if (response.ok) {
-        console.log("Battle data updated successfully");
-        // Refresh the scores list to include updated data
-        await fetchAllScores();
+        console.log("Score updated successfully");
+        await fetchAllScores(); // Refresh the scores list to include updated data
       } else {
-        console.error("Failed to update battle data");
+        console.error("Failed to update score");
       }
     } catch (error) {
-      console.error("Error updating battle data:", error);
+      console.error("Error updating score:", error);
     }
   };
 
+  // Create a new score entry for the user
   const createNewScore = async () => {
     try {
       const response = await fetch("http://localhost:8081/api/scores", {
@@ -101,10 +105,10 @@ const Board = () => {
           battles_lost,
         }),
       });
+
       if (response.ok) {
         console.log("New score created successfully");
-        // Refresh the scores list to include new data
-        await fetchAllScores();
+        await fetchAllScores(); // Refresh the scores list to include new data
       } else {
         console.error("Failed to create new score");
       }
@@ -113,67 +117,59 @@ const Board = () => {
     }
   };
 
+  // Update the scores list when user score or scores change
   useEffect(() => {
     if (userScore) {
-      // Remove any old score for the current user
       const updatedScores = scores.filter(
         (score) => score.username !== username
       );
-
-      // Add the current user's score to the top and sort the remaining scores
-      const sortedScores = [userScore, ...updatedScores].sort((a, b) => {
-        // Define your sorting criteria here
-        return b.total_battles - a.total_battles; // Example: Sort by total battles in descending order
-      });
-
+      const sortedScores = [userScore, ...updatedScores].sort(
+        (a, b) => b.total_battles - a.total_battles
+      );
       setScores(sortedScores);
     }
   }, [userScore, scores, username]);
 
   return (
     <div className="bg-black min-h-screen p-8 text-white">
-      {/* Current User Stats Section */}
       <div className="mb-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
-            Score Board
-          </h1>
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6">
-            <table className="w-full border-collapse">
-              <tbody>
-                <tr className="border-b border-gray-600">
-                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                    User:
-                  </th>
-                  <td className="p-4 text-lg w-3/4">
-                    {username || "Not logged in"}
-                  </td>
-                </tr>
-                <tr className="border-b border-gray-600">
-                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                    Total Battles:
-                  </th>
-                  <td className="p-4 text-lg w-3/4">{battleCount}</td>
-                </tr>
-                <tr className="border-b border-gray-600">
-                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                    Battles Won:
-                  </th>
-                  <td className="p-4 text-lg w-3/4">{battles_won}</td>
-                </tr>
-                <tr>
-                  <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
-                    Battles Lost:
-                  </th>
-                  <td className="p-4 text-lg w-3/4">{battles_lost}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
+          Score Board
+        </h1>
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+          <table className="w-full border-collapse">
+            <tbody>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                  User:
+                </th>
+                <td className="p-4 text-lg w-3/4">
+                  {username || "Not logged in"}
+                </td>
+              </tr>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                  Total Battles:
+                </th>
+                <td className="p-4 text-lg w-3/4">{battleCount}</td>
+              </tr>
+              <tr className="border-b border-gray-600">
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                  Battles Won:
+                </th>
+                <td className="p-4 text-lg w-3/4">{battles_won}</td>
+              </tr>
+              <tr>
+                <th className="text-left text-lg font-semibold p-4 bg-gray-700 w-1/4">
+                  Battles Lost:
+                </th>
+                <td className="p-4 text-lg w-3/4">{battles_lost}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* All Users Scores Table (including current user at the top) */}
       <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
         <h2 className="text-2xl font-semibold mb-4">All Scores</h2>
         <table className="min-w-full divide-y divide-gray-100">
@@ -194,7 +190,6 @@ const Board = () => {
             </tr>
           </thead>
           <tbody className="bg-gray-800 divide-y divide-gray-700">
-            {/* Display all scores including the current user */}
             {scores.map((score, index) => (
               <tr
                 key={index}
@@ -216,11 +211,6 @@ const Board = () => {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="my-25 py-5 text-right rounded-lg text-white">
-        <Link to="/battlefield">
-          <button>Back to Battlefield</button>
-        </Link>
       </div>
     </div>
   );

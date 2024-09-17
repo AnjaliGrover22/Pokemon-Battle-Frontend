@@ -1,4 +1,3 @@
-// Battle.jsx
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import "../App.css";
@@ -34,10 +33,8 @@ const Battle = ({ onUsernameChange }) => {
     getNewPlayer(); // Bot's Pokémon
   }, [selectedId]);
 
-  // Function to generate a random Pokémon ID
   const getRandomPokemonId = () => Math.floor(Math.random() * 1010) + 1;
 
-  // Fetch Pokémon data from API
   const fetchPokemonData = async (id, setter) => {
     try {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
@@ -52,7 +49,6 @@ const Battle = ({ onUsernameChange }) => {
     }
   };
 
-  // Fetch user stats from MongoDB
   const fetchUserStats = async () => {
     if (!username) return; // Ensure username is defined
     try {
@@ -61,13 +57,9 @@ const Battle = ({ onUsernameChange }) => {
       );
       if (response.ok) {
         const data = await response.json();
-        if (data.user) {
-          setBattles_won(data.battles_won || 0);
-          setBattles_lost(data.battles_lost || 0);
-          setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
-        } else {
-          await createNewScore(); // Create a new entry if none exists
-        }
+        setBattles_won(data.battles_won || 0);
+        setBattles_lost(data.battles_lost || 0);
+        setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
       } else {
         console.error("Failed to fetch user data.");
       }
@@ -76,33 +68,6 @@ const Battle = ({ onUsernameChange }) => {
     }
   };
 
-  // Create a new score entry
-  const createNewScore = async () => {
-    try {
-      const response = await fetch("http://localhost:8081/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username,
-          battles_won: 0,
-          battles_lost: 0,
-          total_battles: 0,
-        }),
-      });
-
-      if (response.ok) {
-        console.log("New score created successfully");
-        // Fetch updated user stats to reflect new entry
-        fetchUserStats();
-      } else {
-        console.error("Failed to create new score");
-      }
-    } catch (error) {
-      console.error("Error creating new score:", error);
-    }
-  };
-
-  // Calculate the winner of the battle
   const calculateWinner = (player, bot) => {
     const playerStats = {
       hp: player.stats.find((stat) => stat.stat.name === "hp").base_stat,
@@ -120,7 +85,6 @@ const Battle = ({ onUsernameChange }) => {
       speed: bot.stats.find((stat) => stat.stat.name === "speed").base_stat,
     };
 
-    // Simple battle formula
     const playerScore =
       playerStats.hp +
       playerStats.attack * 2 +
@@ -129,18 +93,13 @@ const Battle = ({ onUsernameChange }) => {
     const botScore =
       botStats.hp + botStats.attack * 2 + botStats.defense + botStats.speed;
 
-    if (playerScore > botScore) {
-      return "Player";
-    } else {
-      return "Opponent";
-    }
+    return playerScore > botScore ? "Player" : "Opponent";
   };
 
-  // Update user data in the database
-  const updateUserData = async (newWins, newLosses) => {
+  const updateUserData = async (username, newWins, newLosses) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`,
+        `http://localhost:8081/api/scores/${username}`, // Include username in the URL
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -162,7 +121,6 @@ const Battle = ({ onUsernameChange }) => {
     }
   };
 
-  // Start a new battle
   const startNewGame = () => {
     if (!selectedPokemon || !botPokemon) {
       console.error("Pokémon data is not ready");
@@ -198,7 +156,6 @@ const Battle = ({ onUsernameChange }) => {
     }, 3000); // 3-second delay for battle animation
   };
 
-  // Fetch a new opponent (bot Pokémon)
   const getNewPlayer = async () => {
     const newBotId = getRandomPokemonId();
     setIsBattleComplete(false);
@@ -218,7 +175,6 @@ const Battle = ({ onUsernameChange }) => {
     }
   };
 
-  // Ensure selectedPokemon and botPokemon are loaded
   if (!selectedPokemon || !botPokemon) {
     return <div className="text-white text-center">Loading...</div>;
   }
@@ -231,14 +187,10 @@ const Battle = ({ onUsernameChange }) => {
           Ready to take action? Click "Attack" when you're set to go!
         </h5>
       </div>
-      {/* Title */}
       <div className="text-center text-white text-3xl font-semibold mt-6">
         Battleground
       </div>
-
-      {/* Battleground Area */}
       <div className="bg-black h-96 w-full flex justify-center items-center rounded-lg mb-20 relative">
-        {/* Player 1 (Your Pokémon) */}
         <div className="w-1/2 flex flex-col justify-center items-center">
           <h2 className="text-2xl font-bold text-white mt-20 capitalize">
             {selectedPokemon.name}
@@ -252,13 +204,9 @@ const Battle = ({ onUsernameChange }) => {
             }`}
           />
         </div>
-
-        {/* VS */}
         <div className="absolute mb-50 items-center text-white text-2xl font-bold">
           V/S
         </div>
-
-        {/* Bot's Pokémon */}
         <div className="w-1/2 flex flex-col justify-center items-center">
           <h2 className="text-2xl font-bold text-white mt-20 capitalize">
             {botPokemon.name}
@@ -273,8 +221,6 @@ const Battle = ({ onUsernameChange }) => {
           />
         </div>
       </div>
-
-      {/* Winner Display */}
       <div className="text-white text-3xl font-bold">
         {isBattleOngoing
           ? "Battle Ongoing..."
@@ -282,13 +228,9 @@ const Battle = ({ onUsernameChange }) => {
           ? `${winner} Wins!`
           : ""}
       </div>
-
-      {/* Battle Count */}
       <div className="text-white text-lg mt-10">
         Number of Battles: {battleCount}
       </div>
-
-      {/* Button to start a new game */}
       <button
         onClick={startNewGame}
         className="mt-6 px-4 py-2 bg-red-500 text-white rounded button"
