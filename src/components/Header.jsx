@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Header = ({ loginame, battleid }) => {
-  console.log("my header id", battleid);
-  const defaultBattleId = 7;
+const Header = ({ loginame }) => {
   return (
     <>
       {/* Top bar */}
@@ -12,15 +10,6 @@ const Header = ({ loginame, battleid }) => {
         </div>
         <div className="text-right flex gap-6 text-lg">
           <Link to="/">Home</Link>
-          {/* <Link
-            to={
-              battleid
-                ? `/battlefield/id/${battleid}`
-                : `/battlefield/id/${defaultBattleId}`
-            }
-          >
-            Battle
-          </Link> */}
           <Link to="/battlefield/board">Scores</Link>
           <Link to="/logout">Logout</Link>
         </div>
