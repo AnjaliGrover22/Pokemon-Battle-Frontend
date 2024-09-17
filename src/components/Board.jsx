@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 const Board = () => {
   const { battleCount, battles_won, battles_lost, username } =
@@ -45,26 +45,6 @@ const Board = () => {
         `http://localhost:8081/api/scores/${username}`
       );
 
-      const data = await response.json();
-
-      //need to check issue from here : No user found in console
-      console.log("data", data);
-
-      if (response.ok) {
-        if (data.username) {
-          // User exists, update the score
-          const userScoreData = {
-            username: data.username,
-            total_battles: data.total_battles + battleCount,
-            battles_won: data.battles_won + battles_won,
-            battles_lost: data.battles_lost + battles_lost,
-          };
-          setUserScore(userScoreData);
-          await updateBattleData(userScoreData);
-        } else {
-          // User does not exist, create a new score
-          await createNewScore();
-        }
       if (!response.ok) {
         const errorData = await response.json();
         console.error(
@@ -76,13 +56,13 @@ const Board = () => {
 
       const data = await response.json();
 
-      if (data.user) {
+      if (data.username) {
         // User exists, update the score
         const userScoreData = {
-          username: data.user.username,
-          total_battles: data.user.total_battles + battleCount,
-          battles_won: data.user.battles_won + battles_won,
-          battles_lost: data.user.battles_lost + battles_lost,
+          username: data.username,
+          total_battles: data.total_battles + battleCount,
+          battles_won: data.battles_won + battles_won,
+          battles_lost: data.battles_lost + battles_lost,
         };
         setUserScore(userScoreData);
         await updateBattleData(userScoreData);
@@ -123,16 +103,7 @@ const Board = () => {
   // Create a new score entry for the user
   const createNewScore = async () => {
     try {
-      console.log(
-        "my new entries",
-        username,
-        total_battles_battles_won,
-        "posting new",
-        username,
-        battleCount,
-        battles_won,
-        battles_lost
-      );
+      console.log("Creating new score for:", username);
       const response = await fetch("http://localhost:8081/api/scores", {
         method: "POST",
         headers: {
@@ -168,7 +139,7 @@ const Board = () => {
       );
       setScores(sortedScores);
     }
-  }, [userScore, scores, username]);
+  }, [userScore]);
 
   return (
     <div className="bg-black min-h-screen p-8 text-white">
