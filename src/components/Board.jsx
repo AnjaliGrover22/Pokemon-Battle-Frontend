@@ -60,9 +60,9 @@ const Board = () => {
         // User exists, update the score
         const userScoreData = {
           username: data.username,
-          total_battles: data.total_battles + battleCount,
-          battles_won: data.battles_won + battles_won,
-          battles_lost: data.battles_lost + battles_lost,
+          total_battles: data.total_battles,
+          battles_won: data.battles_won,
+          battles_lost: data.battles_lost,
         };
         setUserScore(userScoreData);
         await updateBattleData(userScoreData);
