@@ -25,10 +25,12 @@ const Board = () => {
   const fetchAllScores = async () => {
     try {
       const response = await fetch("http://localhost:8081/api/scores");
-
+      console.log(
+        "RUNNING-----------------------------------------------------------------------------------"
+      );
       if (response.ok) {
         const data = await response.json();
-        console.log("fetched data", data);
+        console.log("fetched data scores", data);
         setScores(data); // Set the scores list from the API
       } else {
         console.error("Failed to fetch all scores");

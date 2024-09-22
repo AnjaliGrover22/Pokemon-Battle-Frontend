@@ -98,7 +98,7 @@ const Battle = ({ onUsernameChange }) => {
     return playerScore > botScore ? "Player" : "Opponent";
   };
 
-  const updateUserData = async (username, newWins, newLosses) => {
+  const updateUserData = async (newWins, newLosses) => {
     try {
       const requestBody = {
         battles_won: newWins,
