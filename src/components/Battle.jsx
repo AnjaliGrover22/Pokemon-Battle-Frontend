@@ -63,7 +63,10 @@ const Battle = ({ onUsernameChange }) => {
         setBattles_lost(data.battles_lost || 0);
         setBattleCount((data.battles_won || 0) + (data.battles_lost || 0));
       } else {
-        console.error("Failed to fetch user data.");
+        console.warn("User not found. Initializing scores to 0.");
+        setBattles_won(0);
+        setBattles_lost(0);
+        setBattleCount(0);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -242,7 +245,7 @@ const Battle = ({ onUsernameChange }) => {
           : ""}
       </div>
       <div className="text-white text-lg mt-10">
-        Number of Battles: {battleCount}
+        Number of played Battles: {battleCount}
       </div>
       <button
         onClick={startNewGame}
