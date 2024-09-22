@@ -164,3 +164,39 @@ body {
   align-items: center;
   display: flex;
 }
+
+/*crown blinking effect*/
+.achievement-container h2 {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s infinite; /* Adjust the duration as needed */
+}
+
+/*highlight the row*/
+.blinking-parrot {
+  animation: parrot-blink 1s infinite;
+}
+
+@keyframes parrot-blink {
+  0% {
+    background-color: rgba(0, 255, 0, 0.5); /* Bright green */
+  }
+  50% {
+    background-color: rgba(255, 255, 0, 0.5); /* Bright yellow */
+  }
+  100% {
+    background-color: rgba(2, 92, 2, 0.5); /* Bright blue */
+  }
+}

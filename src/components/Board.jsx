@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import "../App.css";
 
 const Board = () => {
   const { battleCount, battles_won, battles_lost, username } =
     useOutletContext();
   const [scores, setScores] = useState([]);
   const [userScore, setUserScore] = useState(null);
-
-  console.log("vals", battleCount, battles_won, battles_lost, username);
+  const [achievement, setAchievement] = useState(null);
 
   // Fetch all scores when the component mounts
   useEffect(() => {
@@ -21,16 +21,19 @@ const Board = () => {
     }
   }, [username, battleCount, battles_won, battles_lost]);
 
+  // Separate useEffect for calculateAchievement
+  useEffect(() => {
+    if (battles_won !== null) {
+      calculateAchievement();
+    }
+  }, [battles_won]);
+
   // Fetch all scores from the server
   const fetchAllScores = async () => {
     try {
       const response = await fetch("http://localhost:8081/api/scores");
-      console.log(
-        "RUNNING-----------------------------------------------------------------------------------"
-      );
       if (response.ok) {
         const data = await response.json();
-        console.log("fetched data scores", data);
         setScores(data); // Set the scores list from the API
       } else {
         console.error("Failed to fetch all scores");
@@ -53,27 +56,50 @@ const Board = () => {
           "Error fetching user score:",
           errorData.message || "Unknown error"
         );
+
         return;
       }
 
       const data = await response.json();
 
       if (data.username) {
-        // User exists, update the score
-        const userScoreData = {
+        // User exists, prepare updated score data
+        const updatedScoreData = {
           username: data.username,
-          total_battles: data.total_battles,
-          battles_won: data.battles_won,
-          battles_lost: data.battles_lost,
+          total_battles: battleCount,
+          battles_won,
+          battles_lost,
         };
-        setUserScore(userScoreData);
-        await updateBattleData(userScoreData);
+        const scoreChanged =
+          data.total_battles !== battleCount ||
+          data.battles_won !== battles_won ||
+          data.battles_lost !== battles_lost;
+
+        if (scoreChanged) {
+          await updateBattleData(updatedScoreData);
+          setUserScore(updatedScoreData); // Update local state with the latest score
+        } else {
+          setUserScore(data); // Just update the local state if there's no change
+        }
       } else {
         // User does not exist, create a new score
         await createNewScore();
       }
     } catch (error) {
       console.error("Error checking user score:", error);
+    }
+  };
+
+  // Calculate achievements based on battles won
+  const calculateAchievement = () => {
+    if (battles_won > 30) {
+      setAchievement("Diamond Crown");
+    } else if (battles_won > 20) {
+      setAchievement("Gold Crown");
+    } else if (battles_won > 10) {
+      setAchievement("Bronze Crown");
+    } else {
+      setAchievement(null);
     }
   };
 
@@ -113,9 +139,9 @@ const Board = () => {
         },
         body: JSON.stringify({
           username,
-          total_battles: battleCount,
-          battles_won,
-          battles_lost,
+          total_battles: 0,
+          battles_won: 0,
+          battles_lost: 0,
         }),
       });
 
@@ -149,6 +175,19 @@ const Board = () => {
         <h1 className="text-4xl font-bold mb-6 border-b-2 border-gray-600 pb-2">
           Score Board
         </h1>
+
+        {/* Achievement Section */}
+        {achievement ? (
+          <div className="achievement-container mb-4">
+            <h2 className="text-3xl font-bold text-yellow-800 animate-blink">
+              🎉 {achievement} 🎉
+            </h2>
+          </div>
+        ) : (
+          <div className="text-lg text-gray-400 mb-4">
+            Play more battles to earn crowns! 🏆
+          </div>
+        )}
         <div className="bg-gray-800 rounded-lg shadow-lg p-6">
           <table className="w-full border-collapse">
             <tbody>
@@ -203,25 +242,36 @@ const Board = () => {
             </tr>
           </thead>
           <tbody className="bg-gray-800 divide-y divide-gray-700">
-            {scores.map((score, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-gray-700" : "bg-red-600"}
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {score.username}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {score.total_battles}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {score.battles_won}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {score.battles_lost}
-                </td>
-              </tr>
-            ))}
+            {scores.map((score, index) => {
+              const isCurrentUser = score.username === username;
+              const userClass = isCurrentUser
+                ? achievement
+                  ? "blinking-parrot" // If achievement, use blinking
+                  : "bg-green-500" // Apply green background if no achievement
+                : "";
+
+              return (
+                <tr
+                  key={index}
+                  className={`${
+                    index % 2 === 0 ? "bg-gray-700" : "bg-red-600"
+                  } ${userClass}`.trim()}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {score.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {score.total_battles}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {score.battles_won}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {score.battles_lost}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
