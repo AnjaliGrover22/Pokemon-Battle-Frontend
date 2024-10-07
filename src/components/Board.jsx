@@ -31,7 +31,9 @@ const Board = () => {
   // Fetch all scores from the server
   const fetchAllScores = async () => {
     try {
-      const response = await fetch("http://localhost:8081/api/scores");
+      const response = await fetch(
+        "https://pokemon-battle-backend.onrender.com/api/scores"
+      );
       if (response.ok) {
         const data = await response.json();
         setScores(data); // Set the scores list from the API
@@ -47,7 +49,7 @@ const Board = () => {
   const checkUserScore = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`
+        `https://pokemon-battle-backend.onrender.com/api/scores/${username}`
       );
 
       if (!response.ok) {
@@ -107,7 +109,7 @@ const Board = () => {
   const updateBattleData = async (userScoreData) => {
     try {
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`,
+        `https://pokemon-battle-backend.onrender.com/api/scores/${username}`,
         {
           method: "PUT",
           headers: {
@@ -132,18 +134,21 @@ const Board = () => {
   const createNewScore = async () => {
     try {
       console.log("Creating new score for:", username);
-      const response = await fetch("http://localhost:8081/api/scores", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          total_battles: 0,
-          battles_won: 0,
-          battles_lost: 0,
-        }),
-      });
+      const response = await fetch(
+        "https://pokemon-battle-backend.onrender.com/api/scores",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            total_battles: 0,
+            battles_won: 0,
+            battles_lost: 0,
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log("New score created successfully");
