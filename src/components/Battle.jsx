@@ -55,7 +55,7 @@ const Battle = ({ onUsernameChange }) => {
     if (!username) return; // Ensure username is defined
     try {
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`
+        `https://pokemon-battle-backend.onrender.com/api/scores/${username}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -112,7 +112,7 @@ const Battle = ({ onUsernameChange }) => {
       console.log("Request body:", requestBody); // Log request body
 
       const response = await fetch(
-        `http://localhost:8081/api/scores/${username}`,
+        `https://pokemon-battle-backend.onrender.com/api/scores/${username}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

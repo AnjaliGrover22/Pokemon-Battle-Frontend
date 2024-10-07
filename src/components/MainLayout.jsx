@@ -25,7 +25,7 @@ const MainLayout = ({ username, onUsernameChange }) => {
 
       try {
         const response = await fetch(
-          `http://localhost:8081/api/scores/${username}`
+          `https://pokemon-battle-backend.onrender.com/api/scores/${username}`
         );
 
         if (response.ok) {
